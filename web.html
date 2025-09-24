@@ -1,0 +1,362 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8" />
+    <title>Final Grade & GPA Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        /* ---- Minimalist, clean, and fancy styling ---- */
+        :root{
+        --bg:#6c1616;
+        --card:#530209;
+        --ink:#e8eaf1;
+        --muted:#a5acc6;
+        --accent:#7c9cff;
+        --ok:#7dffa7;
+        --warn:#ffb86b;
+        --err:#ff6b6b;
+        --ring: rgba(124,156,255,.45);
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+        margin:0;
+        font:16px/1.5 Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        color:var(--ink);
+        background:
+            radial-gradient(1200px 600px at 80% -10%, #1b2030 0%, transparent 60%),
+            radial-gradient(800px 500px at -10% 110%, #1b2030 0%, transparent 60%),
+            var(--bg);
+        display:grid;
+        place-items:center;
+        padding:24px;
+        }
+        .wrap{
+        width:100%;
+        max-width:760px;
+        }
+        .card{
+        background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+        border:1px solid rgba(255,255,255,.06);
+        border-radius:20px;
+        padding:28px;
+        box-shadow:
+            0 10px 30px rgba(0,0,0,.35),
+            inset 0 0 0 1px rgba(255,255,255,.02);
+        backdrop-filter: blur(6px);
+        }
+        h1{
+        margin:0 0 6px;
+        font-weight:700;
+        letter-spacing:.3px;
+        font-size:28px;
+        }
+        p.sub{
+        margin:0 0 22px;
+        color:var(--muted);
+        }
+        .grid{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:14px;
+        }
+        .full{grid-column:1 / -1;}
+        label{
+        display:block;
+        font-size:13px;
+        color:var(--muted);
+        margin:0 0 6px;
+        }
+        input[type="text"], input[type="number"]{
+        width:100%;
+        padding:12px 14px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,.08);
+        background:var(--card);
+        color:var(--ink);
+        outline:none;
+        transition: box-shadow .2s, border-color .2s, transform .05s;
+        }
+        input:focus{
+        border-color:var(--accent);
+        box-shadow:0 0 0 6px var(--ring);
+        transform: translateY(-1px);
+        }
+        .hint{
+        font-size:12px;
+        color:var(--muted);
+        margin-top:6px;
+        }
+        .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+        button{
+        appearance:none;
+        border:0;
+        border-radius:12px;
+        padding:12px 16px;
+        font-weight:600;
+        cursor:pointer;
+        transition: transform .05s ease, box-shadow .2s ease, background .2s ease;
+        }
+        .primary{
+        background:linear-gradient(180deg, #acae9e, #868890);
+        color:#0b0f1a;
+        box-shadow:0 6px 20px rgba(124,156,255,.35);
+        }
+        .primary:hover{transform:translateY(-1px)}
+        .ghost{
+        background:transparent;
+        color:var(--ink);
+        border:1px solid rgba(255,255,255,.12);
+        }
+        .results{
+        margin-top:20px;
+        padding:16px;
+        border-radius:14px;
+        background:rgba(255,255,255,.04);
+        border:1px solid rgba(255,255,255,.08);
+        }
+        .results strong{font-size:18px}
+        .badge{
+        display:inline-block;
+        padding:6px 10px;
+        border-radius:999px;
+        background:rgba(255,255,255,.08);
+        margin-left:8px;
+        font-weight:700;
+        letter-spacing:.5px;
+        }
+        .ok{color:var(--ok)}
+        .warn{color:var(--warn)}
+        .err{color:var(--err)}
+        footer{
+        margin-top:14px;
+        text-align:center;
+        color:var(--muted);
+        font-size:12px;
+        }
+    </style>
+    </head>
+    <body>
+    <div class="wrap">
+        <div class="card">
+        <h1>Final Grade & GPA</h1>
+        <p class="sub">Enter raw scores out of 100. We’ll apply the weights (25/30/1/4/15/25%), round your final score, and assign a letter & 4.0 GPA.</p>
+
+        <div class="grid">
+            <div class="full">
+            <label for="student">Student name</label>
+            <input id="student" type="text" placeholder="e.g., Alex Johnson" />
+            </div>
+
+            <div>
+            <label for="t1">Test 1 — 25%</label>
+            <input id="t1" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+
+            <div>
+            <label for="t2">Test 2 — 30%</label>
+            <input id="t2" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+
+            <div>
+            <label for="p1">Project 1 — 1%</label>
+            <input id="p1" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+
+            <div>
+            <label for="p2">Project 2 — 4%</label>
+            <input id="p2" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+
+            <div>
+            <label for="p3">Project 3 — 15%</label>
+            <input id="p3" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+
+            <div>
+            <label for="asmt">Assignment Score — 25%</label>
+            <input id="asmt" type="number" min="0" max="100" step="0.1" placeholder="0–100" />
+            <div class="hint">100 pts possible</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="primary" id="calcBtn">Calculate</button>
+            <button class="ghost" id="resetBtn">Reset</button>
+        </div>
+
+        <div class="results" id="results" style="display:none">
+            <div id="nameLine"></div>
+            <div style="margin-top:8px">
+            <strong>Final (weighted & rounded):</strong>
+            <span id="finalPct" class="badge"></span>
+            </div>
+            <div style="margin-top:8px">
+            <strong>Letter grade:</strong>
+            <span id="letter" class="badge"></span>
+            </div>
+            <div style="margin-top:8px">
+            <strong>GPA (4.0 scale):</strong>
+            <span id="gpa" class="badge"></span>
+            </div>
+        </div>
+
+        <footer>Scale: 94+=A, 90–93.9=A-, 87–89.9=B+, 84–86.9=B, 80–83.9=B-, 77–79.9=C+, 74–76.9=C, 70–73.9=C-, 67–69.9=D+, 64–66.9=D, 60–63.9=D-, &lt;60=F</footer>
+        </div>
+    </div>
+
+    <script>
+        // Grab important elements from the page by their IDs
+        const studentInput = document.getElementById('student');   // student name field
+        const t1Input      = document.getElementById('t1');        // Test 1 input (25%)
+        const t2Input      = document.getElementById('t2');        // Test 2 input (30%)
+        const p1Input      = document.getElementById('p1');        // Project 1 input (1%)
+        const p2Input      = document.getElementById('p2');        // Project 2 input (4%)
+        const p3Input      = document.getElementById('p3');        // Project 3 input (15%)
+        const asmtInput    = document.getElementById('asmt');      // Assignment score input (25%)
+        const calcBtn      = document.getElementById('calcBtn');   // Calculate button
+        const resetBtn     = document.getElementById('resetBtn');  // Reset button
+
+        const resultsBox   = document.getElementById('results');   // results container
+        const nameLine     = document.getElementById('nameLine');  // shows student name
+        const finalPctSpan = document.getElementById('finalPct');  // shows final %
+        const letterSpan   = document.getElementById('letter');    // shows letter grade
+        const gpaSpan      = document.getElementById('gpa');       // shows GPA on 4.0
+
+        // Helper function: safely convert any input to a number between 0 and 100
+        function clampScore(raw) {
+        // Convert the input string to a floating number
+        const n = parseFloat(raw);
+        // If not a number, treat it as 0
+        if (isNaN(n)) return 0;
+        // Ensure result stays in [0, 100]
+        if (n < 0) return 0;
+        if (n > 100) return 100;
+        return n;
+        }
+
+        // Helper function: round to one decimal place
+        function round1(x) {
+        // Multiply by 10, round to nearest integer, then divide back by 10
+        return Math.round(x * 10) / 10;
+        }
+
+        // Helper function: convert final % to a letter grade using if/else chain
+        function toLetter(percent) {
+        // We read the scale top-down and return as soon as a range matches
+        if (percent >= 94) return "A";
+        else if (percent >= 90) return "A-";
+        else if (percent >= 87) return "B+";
+        else if (percent >= 84) return "B";
+        else if (percent >= 80) return "B-";
+        else if (percent >= 77) return "C+";
+        else if (percent >= 74) return "C";
+        else if (percent >= 70) return "C-";
+        else if (percent >= 67) return "D+";
+        else if (percent >= 64) return "D";
+        else if (percent >= 60) return "D-";
+        // If none of the above matched, it's below 60 → F
+        return "F";
+        }
+
+        // Helper function: map letter grade to 4.0 GPA using if/else (no arrays)
+        function letterToGPA(letter) {
+        // Standard common mapping on a 4.0 scale
+        if (letter === "A")  return 4.0;
+        if (letter === "A-") return 3.7;
+        if (letter === "B+") return 3.3;
+        if (letter === "B")  return 3.0;
+        if (letter === "B-") return 2.7;
+        if (letter === "C+") return 2.3;
+        if (letter === "C")  return 2.0;
+        if (letter === "C-") return 1.7;
+        if (letter === "D+") return 1.3;
+        if (letter === "D")  return 1.0;
+        if (letter === "D-") return 0.7;
+        // F or anything else defaults to 0.0
+        return 0.0;
+        }
+
+        // Click handler: perform the full calculation
+        calcBtn.addEventListener('click', function () {
+        // Read and clamp every score to [0..100]
+        const t1   = clampScore(t1Input.value);   // Test 1 raw score
+        const t2   = clampScore(t2Input.value);   // Test 2 raw score
+        const p1   = clampScore(p1Input.value);   // Project 1 raw score
+        const p2   = clampScore(p2Input.value);   // Project 2 raw score
+        const p3   = clampScore(p3Input.value);   // Project 3 raw score
+        const asmt = clampScore(asmtInput.value); // Assignment raw score
+
+        // Apply weights directly (percent weights sum to 100)
+        // Each raw score is already in 0–100, so we multiply by its weight and divide by 100
+        const wT1   = t1   * 0.25;  // 25%
+        const wT2   = t2   * 0.30;  // 30%
+        const wP1   = p1   * 0.01;  // 1%
+        const wP2   = p2   * 0.04;  // 4%
+        const wP3   = p3   * 0.15;  // 15%
+        const wAsmt = asmt * 0.25;  // 25%
+
+        // Sum the weighted components to get the final numeric grade out of 100
+        const finalRaw = wT1 + wT2 + wP1 + wP2 + wP3 + wAsmt;
+
+        // Round the final to one decimal place for display
+        const finalRounded = round1(finalRaw);
+
+        // Convert that rounded score to a letter grade
+        const letter = toLetter(finalRounded);
+
+        // Convert letter to a 4.0 GPA value
+        const gpa = letterToGPA(letter);
+
+        // Update UI with the results
+        const name = studentInput.value.trim();
+        nameLine.innerHTML = name ? `<strong>Student:</strong> ${name}` : `<strong>Student:</strong> (unnamed)`;
+
+        finalPctSpan.textContent = `${finalRounded}%`;
+        letterSpan.textContent   = letter;
+        gpaSpan.textContent      = gpa.toFixed(1);
+
+        // Add a little color hint based on the result
+        finalPctSpan.classList.remove('ok','warn','err');
+        letterSpan.classList.remove('ok','warn','err');
+        gpaSpan.classList.remove('ok','warn','err');
+
+        // Green for A/B, amber for C, red for D/F
+        if (finalRounded >= 84) {
+            finalPctSpan.classList.add('ok'); letterSpan.classList.add('ok'); gpaSpan.classList.add('ok');
+        } else if (finalRounded >= 70) {
+            finalPctSpan.classList.add('warn'); letterSpan.classList.add('warn'); gpaSpan.classList.add('warn');
+        } else {
+            finalPctSpan.classList.add('err'); letterSpan.classList.add('err'); gpaSpan.classList.add('err');
+        }
+
+        // Reveal the results box
+        resultsBox.style.display = 'block';
+        });
+
+        // Reset handler: clears all inputs and hides results
+        resetBtn.addEventListener('click', function () {
+        // Clear every input field
+        studentInput.value = '';
+        t1Input.value = '';
+        t2Input.value = '';
+        p1Input.value = '';
+        p2Input.value = '';
+        p3Input.value = '';
+        asmtInput.value = '';
+
+        // Hide the results area and clear its content
+        resultsBox.style.display = 'none';
+        nameLine.textContent = '';
+        finalPctSpan.textContent = '';
+        letterSpan.textContent = '';
+        gpaSpan.textContent = '';
+        });
+    </script>
+    </body>
+    </html>
